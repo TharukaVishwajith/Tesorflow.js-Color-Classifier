@@ -40,6 +40,22 @@ function gotData(results) {
     }
     console.log(colorByLable);
 
+    let blues = colorByLable['blue-ish'];
+    let x = 0;
+    let y = 0;
+
+    for(let i = 0; i< blues.length; i++){
+      noStroke();
+      fill(blues[i]);
+      // fill(222,44,55)
+      rect(x,y,10,10);
+      x+=10;
+      if(x >= width){
+        x = 0;
+        y += 10;
+      }
+    }
+
   // let uidByCount = {}
   // let users = [];
   // for(let key of keys ){
@@ -66,57 +82,10 @@ function errorData(err){
   console.log(err);
 }
 
-function pickColor(){
-  r = floor(random(255));
-  g = floor(random(255));
-  b = floor(random(255));
-  background(r,g,b);
-}
+
 
 function setup() {
   createCanvas(400,400);
-  pickColor();
-
-  let buttons = [];
-  buttons.push(createButton('red-ish'));
-  buttons.push(createButton('blue-ish'));
-  buttons.push(createButton('green-ish'));
-  buttons.push(createButton('orange-ish'));
-  buttons.push(createButton('yello-ish'));
-  buttons.push(createButton('pink-ish'));
-  buttons.push(createButton('purple-ish'));
-  buttons.push(createButton('brown-ish'));
-  buttons.push(createButton('gray-ish'));
-
-  for(let i = 0; i < buttons.length; i++ ){
-    buttons[i].mousePressed(sendData)
-  }
-  
-
-  async function sendData(){
-    let colorDatabase = database.ref('colors');
-    let { user } = await authPromise;
-    var data = {
-      r: r,
-      g: g,
-      b: b,
-      lable: this.html(),
-      uid: user.uid
-    }
-    let color = colorDatabase.push(data,finished)
-    console.log('Saving data');
-    console.log(data);
-
-    function finished(err){
-      if(err){
-        console.log('Somting is wrong!');
-        console.error(err);
-      }else{
-        console.log('Data saved success!');
-        pickColor();
-      }
-    }
-  }
 
   
  
