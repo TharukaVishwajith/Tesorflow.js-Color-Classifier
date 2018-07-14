@@ -1,5 +1,7 @@
 let r,g,b;
 let database;
+let authPromise;
+
 
 var config = {
   apiKey: "AIzaSyBz0E9GGdLmcyDh9ODadXYTU0UlLer5qks",
@@ -11,6 +13,40 @@ var config = {
 };
 firebase.initializeApp(config);
 database = firebase.database();
+authPromise = firebase.auth().signInAnonymously();
+let ref = database.ref('colors');
+ref.once('value', gotData, errorData);
+
+function gotData(results) {
+  let data = results.val();
+  let keys = Object.keys(data);
+
+  let uidByCount = {}
+  let users = [];
+  for(let key of keys ){
+    let record = data[key];
+    let id = record.uid;
+    // console.log(record.uid);
+    if(!uidByCount[id]){
+      uidByCount[id] = 1;
+      users.push(id);
+    }else{
+      uidByCount[id]++;
+    }
+  }
+  users = users.sort((a,b)=>{
+    return uidByCount[a] - uidByCount[b];
+  });
+
+  for(let id of users){
+    console.log(` ${uidByCount[id]} -  ${id}`);
+  }
+  
+}
+
+function errorData(err){
+  console.log(err);
+}
 
 function pickColor(){
   r = floor(random(255));
@@ -22,7 +58,7 @@ function pickColor(){
 function setup() {
   createCanvas(400,400);
   pickColor();
-  
+
   let buttons = [];
   buttons.push(createButton('red-ish'));
   buttons.push(createButton('blue-ish'));
@@ -39,14 +75,15 @@ function setup() {
   }
   
 
-  function sendData(){
+  async function sendData(){
     let colorDatabase = database.ref('colors');
-
+    let { user } = await authPromise;
     var data = {
       r: r,
       g: g,
       b: b,
-      lable: this.html()
+      lable: this.html(),
+      uid: user.uid
     }
     let color = colorDatabase.push(data,finished)
     console.log('Saving data');
