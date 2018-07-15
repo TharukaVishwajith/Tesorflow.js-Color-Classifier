@@ -33,28 +33,38 @@ function gotData(results) {
   let data = results.val();
   let keys = Object.keys(data);
 
-    for(let key of keys ){
-      let record = data[key];
-      let col = color(record.r,record.g,record.b);
-      colorByLable[record.lable].push(col);
-    }
-    console.log(colorByLable);
+  let allData = {
+    entries: []
+  }
 
-    let blues = colorByLable['blue-ish'];
-    let x = 0;
-    let y = 0;
+  for(let key of keys){
+    let record = data[key];
+    allData.entries.push(record);
+  }
 
-    for(let i = 0; i< blues.length; i++){
-      noStroke();
-      fill(blues[i]);
-      // fill(222,44,55)
-      rect(x,y,10,10);
-      x+=10;
-      if(x >= width){
-        x = 0;
-        y += 10;
-      }
-    }
+  saveJSON(allData, 'colorData.json');
+
+    // use to visualize data
+    // for(let key of keys ){
+    //   let record = data[key];
+    //   let col = color(record.r,record.g,record.b);
+    //   colorByLable[record.lable].push(col);
+    // }
+    // let blues = colorByLable['blue-ish'];
+    // let x = 0;
+    // let y = 0;
+    
+    // for(let i = 0; i< blues.length; i++){
+    //   noStroke();
+    //   fill(blues[i]);
+    //   // fill(222,44,55)
+    //   rect(x,y,10,10);
+    //   x+=10;
+    //   if(x >= width){
+    //     x = 0;
+    //     y += 10;
+    //   }
+    // }
 
   // let uidByCount = {}
   // let users = [];
