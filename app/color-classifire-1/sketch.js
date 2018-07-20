@@ -1,4 +1,5 @@
 let data;
+let model;
 let lableList = [
   'blue-ish',
   'green-ish',
@@ -37,6 +38,21 @@ function setup() {
   xs.print();
   ys.print();
 
+ model = tf.sequential();
+ 
+ let hidden = tf.layers.dense({
+   units: 16,
+   activation: 'sigmoid',
+   inputDim: [3]
+ });
+
+ let output = tf.layers.dense({
+  units: 9,
+  activation: 'softmax'
+});
+
+model.add(hidden);
+model.add(output);
 }
 
 
