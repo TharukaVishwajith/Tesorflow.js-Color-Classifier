@@ -39,7 +39,7 @@ function setup() {
   ys.print();
 
  model = tf.sequential();
- 
+
  let hidden = tf.layers.dense({
    units: 16,
    activation: 'sigmoid',
@@ -53,6 +53,15 @@ function setup() {
 
 model.add(hidden);
 model.add(output);
+
+// Optimizer 
+const lr = 0.5;
+const optimizer = tf.train.sgd(lr);
+
+model.compile({
+  optimizer: optimizer,
+  loss: 'categoricalCrossentropy'
+})
 }
 
 
