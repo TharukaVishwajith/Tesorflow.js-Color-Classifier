@@ -1,5 +1,7 @@
 let data;
 let model;
+let xs,ys;
+let lossP;
 let lableList = [
   'blue-ish',
   'green-ish',
@@ -17,6 +19,7 @@ function preload() {
 }
 
 function setup() {
+  lossP = createP('loss');
   console.log(data);
   let colors = [];
   let lables = [];
@@ -28,54 +31,78 @@ function setup() {
   }
 
   let lablesTensor = tf.tensor1d(lables, 'int32');
-  let ys = tf.oneHot(lablesTensor, 9);
+  ys = tf.oneHot(lablesTensor, 9);
   lablesTensor.dispose();
 
-  let xs = tf.tensor2d(colors);
+  xs = tf.tensor2d(colors);
 
   console.log(xs.shape);
   console.log(ys.shape);
   xs.print();
   ys.print();
 
- model = tf.sequential();
+  model = tf.sequential();
 
- let hidden = tf.layers.dense({
-   units: 16,
-   activation: 'sigmoid',
-   inputDim: 3
- });
+  let hidden = tf.layers.dense({
+    units: 16,
+    activation: 'sigmoid',
+    inputDim: 3
+  });
 
- let output = tf.layers.dense({
-  units: 9,
-  activation: 'softmax'
-});
+  let output = tf.layers.dense({
+    units: 9,
+    activation: 'softmax'
+  });
 
-model.add(hidden);
-model.add(output);
+  model.add(hidden);
+  model.add(output);
 
-// Optimizer 
-const lr = 0.5;
-const optimizer = tf.train.sgd(lr);
+  // Optimizer 
+  const lr = 0.5;
+  const optimizer = tf.train.sgd(lr);
 
 
-model.compile({
-  optimizer: optimizer,
-  loss: 'categoricalCrossentropy'
-});
+  model.compile({
+    optimizer: optimizer,
+    loss: 'categoricalCrossentropy'
+  });
 
-// option for fit function call 
-const options = {
-  epochs: 20,
-  validationSplit: 0.1,
-  shuffle: true
+  //tf.nextFrame();
+  train().then( result => {
+    console.log(result.history.loss)
+  });
+
+  createCanvas(400,400);
+
 }
-model.fit(xs, ys, options).then( result => {
-  console.log(result.history.loss);
-});
+
+
+async function train() {
+  // option for fit function call 
+  const options = {
+    epochs: 1000,
+    validationSplit: 0.1,
+    shuffle: true,
+    callbacks: {
+      onTrainBegin: ()=> console.log('training started!'),
+      onTrainEnd: () => console.log('training ended!'),
+      onBatchEnd: async (num, logs) => {
+        await tf.nextFrame();
+      },
+      onEpochEnd: (num, logs) => {
+        lossP.html(`Loss : ${logs.loss}`);
+      }
+    }
+  }
+ return model.fit(xs, ys, options);
 }
 
 
 function draw() {
-  // put drawing code here
+  background(0);
+  stroke(255);
+  strokeWeight(4);
+  line(frameCount % width, 0, frameCount % width, height);
+
+
 }
