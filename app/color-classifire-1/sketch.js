@@ -6,6 +6,7 @@ let lossP;
 let rSlider;
 let gSlider;
 let bSlider;
+let lableP;
 
 let lableList = [
   'blue-ish',
@@ -27,8 +28,10 @@ function setup() {
   rSlider = createSlider(0,255,255);
   gSlider = createSlider(0,255,255);
   bSlider = createSlider(0,255,0);
+  lableP = createP();
 
   lossP = createP('loss');
+
   console.log(data);
   let colors = [];
   let lables = [];
@@ -95,9 +98,7 @@ async function train() {
     callbacks: {
       onTrainBegin: ()=> console.log('training started!'),
       onTrainEnd: () => console.log('training ended!'),
-      onBatchEnd: async (num, logs) => {
-        await tf.nextFrame();
-      },
+      onBatchEnd: tf.nextFrame ,
       onEpochEnd: (num, logs) => {
         lossP.html(`Loss : ${logs.loss}`);
       }
@@ -112,9 +113,20 @@ function draw() {
   let g = gSlider.value();
   let b = bSlider.value();
   background(r,g,b);
+
+  const x = tf.tensor2d([
+    [r/255 ,g/255, b/255]
+  ]);
+
+  let results = model.predict(x);
+  let index = results.argMax(1).dataSync()[0];
+  // index.print();
+  let lable = lableList[index]
+  console.log(lable);
+  lableP.html(lable);
+
+
   // stroke(255);
   // strokeWeight(4);
   // line(frameCount % width, 0, frameCount % width, height);
-
-
 }
